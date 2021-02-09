@@ -11,8 +11,9 @@ webhook_url = "https://webhook.site/14693700-0cce4ef4-9961-e927cf90c008"
 
 app = Flask(__name__)
 
-# URI database mongo by dave *ESTA URL ESTARA DISPONIBLE 2 DIAS*
-app.config['MONGO_URI']='mongodb+srv://dave:123ok@cluster0-yxxsk.mongodb.net/todoLegal'
+# URI database mongo by dave 
+# El usuario '''tlegal''' estará disponible hasta mañana miercoles (24:00), despues será eliminado automáticamente de la BDD
+app.config['MONGO_URI']='mongodb+srv://tlegal:tlegal@cluster0-yxxsk.mongodb.net/todoLegal'
 
 mongo = PyMongo(app)
 
@@ -27,7 +28,7 @@ def create_vcambio():
     close = request.json['close']
     adjClose = request.json['adjclose']
     tipo = request.json['tipo']
-    
+    # guardar en BDD
     id_saved = mongo.db.vcambio.insert({"fecha":fecha,"open":open_,"high":high,"low":low,"close":close,"adjClose":adjClose,"tipo":tipo})
     return {'message':'Guardado: '+str(id_saved)}
 
@@ -36,7 +37,7 @@ def create_vcambio():
 def get_vcambios():
     vcambios = mongo.db.vcambio.find()
     response = json_util.dumps(vcambios)
-     response_w = requests.post(webhook_url, data=response,headers={'Content-Type': 'application/json'})
+    response_w = requests.post(webhook_url, data=response,headers={'Content-Type': 'application/json'})
     return Response(response, mimetype="application/json")
 
 # OBTENER POR ID
@@ -47,7 +48,7 @@ def get_vcambioId(id):
     response_w = requests.post(webhook_url, data=response,headers={'Content-Type': 'application/json'})
     return Response(response, mimetype="application/json")
 
-# OBTENER POR QUERY
+# OBTENER POR busqueda
 @app.route('/vcambio_q/<q>', methods=['GET'])
 def get_vcambio_q(q):
     vcambio = mongo.db.vcambio.aggregate([
